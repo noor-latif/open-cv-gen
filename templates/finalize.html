@@ -12,9 +12,9 @@
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
         <h2 class="text-xl font-semibold text-gray-900 mb-4">Job Information</h2>
         <div class="space-y-2">
-            <p><strong>Company:</strong> {{ company }}</p>
-            <p><strong>Job Title:</strong> {{ job_title }}</p>
-            <p><strong>Job Description:</strong></p>
+            <p class="text-gray-900"><strong>Company:</strong> {{ company }}</p>
+            <p class="text-gray-900"><strong>Job Title:</strong> {{ job_title }}</p>
+            <p class="text-gray-900"><strong>Job Description:</strong></p>
             <div class="bg-gray-50 p-4 rounded-md max-h-40 overflow-y-auto">
                 <pre class="text-sm text-gray-700 whitespace-pre-wrap">{{ job_description[:500] }}{% if job_description|length > 500 %}...{% endif %}</pre>
             </div>
@@ -29,20 +29,20 @@
                 <h3 class="font-semibold text-gray-900 mb-2">{{ skill }}</h3>
                 <div class="ml-4 space-y-1 text-sm">
                     {% if answer.has_experience %}
-                    <p><span class="text-green-600 font-medium">✓ Has Experience</span></p>
+                    <p class="text-gray-900"><span class="text-green-600 font-medium">✓ Has Experience</span></p>
                     {% if answer.experience_level %}
-                    <p><strong>Level:</strong> {{ answer.experience_level|title }}</p>
+                    <p class="text-gray-900"><strong>Level:</strong> {{ answer.experience_level|title }}</p>
                     {% endif %}
                     {% if answer.description %}
-                    <p><strong>Description:</strong> {{ answer.description }}</p>
+                    <p class="text-gray-900"><strong>Description:</strong> {{ answer.description }}</p>
                     {% endif %}
                     {% elif answer.has_experience == False %}
-                    <p><span class="text-yellow-600 font-medium">⚠ Related Experience</span></p>
+                    <p class="text-gray-900"><span class="text-yellow-600 font-medium">⚠ Related Experience</span></p>
                     {% if answer.related_experience %}
-                    <p><strong>Related Experience:</strong> {{ answer.related_experience }}</p>
+                    <p class="text-gray-900"><strong>Related Experience:</strong> {{ answer.related_experience }}</p>
                     {% endif %}
                     {% else %}
-                    <p><span class="text-gray-500">⊘ Skipped</span></p>
+                    <p class="text-gray-900"><span class="text-gray-500">⊘ Skipped</span></p>
                     {% endif %}
                 </div>
             </div>

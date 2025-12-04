@@ -38,8 +38,7 @@
                                name="has_experience" 
                                value="yes" 
                                class="mr-2"
-                               {% if existing_answer.has_experience %}checked{% endif %}
-                               required>
+                               {% if existing_answer.has_experience %}checked{% endif %}>
                         <span class="text-sm text-gray-700">Yes, I have experience</span>
                     </label>
                     <label class="flex items-center">
@@ -47,8 +46,7 @@
                                name="has_experience" 
                                value="no" 
                                class="mr-2"
-                               {% if existing_answer.has_experience == False %}checked{% endif %}
-                               required>
+                               {% if existing_answer.has_experience == False %}checked{% endif %}>
                         <span class="text-sm text-gray-700">No, but I have related experience</span>
                     </label>
                     <label class="flex items-center">
@@ -120,6 +118,12 @@
                         class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                     {% if skill_index < total_skills %}Next →{% else %}Review Answers{% endif %}
                 </button>
+                {% if skill_index >= total_skills %}
+                <a href="{{ url_for('cv.finalize') }}" 
+                   class="flex-1 text-center px-6 py-3 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                    Review Answers (Skip)
+                </a>
+                {% endif %}
             </div>
         </div>
     </form>

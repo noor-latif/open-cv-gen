@@ -229,6 +229,10 @@ def questions():
         current_skill = skill_gaps[current_index]
         has_experience_val = request.form.get('has_experience')
         
+        # If no answer provided, treat as skip
+        if not has_experience_val:
+            has_experience_val = 'skip'
+        
         # Handle skip option
         if has_experience_val == 'skip':
             gen_data['answers'][current_skill] = {
@@ -304,13 +308,7 @@ def finalize():
         return redirect(url_for('cv.generate'))
     
     gen_data = session['cv_generation']
-    
-    # Reset to last question if not all answered
     skill_gaps = gen_data['skill_gaps']
-    if gen_data.get('current_skill_index', 0) < len(skill_gaps):
-        gen_data['current_skill_index'] = len(skill_gaps) - 1
-        session['cv_generation'] = gen_data
-        return redirect(url_for('cv.questions'))
     
     if request.method == 'GET':
         # Show summary before generating

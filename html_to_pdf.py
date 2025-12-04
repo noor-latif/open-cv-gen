@@ -79,7 +79,7 @@ def main():
     """Main entry point."""
     if len(sys.argv) < 2:
         print("Usage: python html_to_pdf.py <html_file> [output_pdf]")
-        print("Example: python html_to_pdf.py cv-system-fixed.html")
+        print("Example: python html_to_pdf.py cv.html")
         sys.exit(1)
     
     html_file = sys.argv[1]

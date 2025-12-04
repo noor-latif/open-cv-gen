@@ -1,0 +1,61 @@
+# CV Tailoring Dashboard - Cursor Rules
+
+## Verification Before Completion
+
+**CRITICAL RULE**: Before declaring any implementation "complete" or "ready to use", you MUST:
+
+1. **Run the verification test script**:
+   ```bash
+   uv run python test_app.py
+   ```
+   All tests must pass (7/7) before declaring completion.
+
+2. **Verify the application can start**:
+   ```bash
+   uv run python run.py
+   ```
+   The app should start without errors (you can interrupt after confirming it starts).
+
+3. **Check for common issues**:
+   - All required files exist (templates, app modules, config.json)
+   - Dependencies are installed (`uv sync`)
+   - No import errors
+   - Flask routes are accessible
+   - Templates can be rendered
+
+4. **If any test fails**:
+   - Fix the issue immediately
+   - Re-run tests until all pass
+   - Never say "ready to use" if tests fail
+
+## Project Structure
+
+- Flask app in `app/` directory
+- Templates in `templates/` directory
+- Static files in `static/` directory
+- Application data in `applications/` and `cv_history/` directories
+- Configuration in `config.json`
+- Test script: `test_app.py`
+
+## Dependencies
+
+- Use `uv` for package management (not pip)
+- Use `uv run` instead of `python` directly
+- Required: Flask, OpenAI SDK, Playwright, BeautifulSoup4
+
+## Testing Checklist
+
+Before saying "ready to use", verify:
+- [ ] All modules import without errors
+- [ ] Storage initializes correctly
+- [ ] AI client can be created
+- [ ] Flask app can be instantiated
+- [ ] All routes return 200 status codes
+- [ ] All templates exist and can be rendered
+- [ ] Base CV template exists
+- [ ] Application can start without errors
+- [ ] **API connection works** - Run `uv run python test_api_connection.py` and verify it passes
+  - If API test fails with 404, the gateway URL is likely incorrect
+  - Official Vercel Gateway: `https://ai-gateway.vercel.sh/v1`
+  - Custom gateways must be accessible and end with `/v1`
+

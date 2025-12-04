@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - CV Tailoring{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <h1 class="text-3xl font-bold text-gray-900">Application History</h1>
+    <p class="mt-2 text-gray-600">View and manage your tailored CV applications</p>
+</div>
+
+{% if applications %}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for app in applications %}
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+        <div class="flex justify-between items-start mb-4">
+            <div>
+                <h3 class="text-lg font-semibold text-gray-900">{{ app.company }}</h3>
+                <p class="text-sm text-gray-600 mt-1">{{ app.job_title }}</p>
+            </div>
+            <span class="text-xs text-gray-500">
+                {{ app.created_at[:10] if app.created_at else '' }}
+            </span>
+        </div>
+        
+        <div class="mb-4">
+            <p class="text-sm text-gray-700 line-clamp-3">
+                {{ app.job_description[:150] }}...
+            </p>
+        </div>
+        
+        {% if app.skill_gaps %}
+        <div class="mb-4">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                {{ app.skill_gaps|length }} skill gap{{ 's' if app.skill_gaps|length != 1 else '' }}
+            </span>
+        </div>
+        {% endif %}
+        
+        <div class="flex space-x-2">
+            <a href="{{ url_for('cv.application', app_id=app.id) }}" 
+               class="flex-1 text-center px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700">
+                View Details
+            </a>
+            {% if app.cv_pdf_path %}
+            <a href="{{ url_for('cv.download_pdf', app_id=app.id) }}" 
+               class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md text-sm font-medium hover:bg-gray-200">
+                PDF
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+    </svg>
+    <h3 class="mt-4 text-lg font-medium text-gray-900">No applications yet</h3>
+    <p class="mt-2 text-gray-600">Get started by generating your first tailored CV</p>
+    <div class="mt-6">
+        <a href="{{ url_for('cv.generate') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700">
+            Generate New CV
+        </a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+

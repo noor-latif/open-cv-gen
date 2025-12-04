@@ -1,0 +1,9 @@
+{
+  "ai": {
+    "gateway_url": "",
+    "api_key": "",
+    "model": "gpt-4"
+  },
+  "cv_template_path": "cv.html"
+}
+

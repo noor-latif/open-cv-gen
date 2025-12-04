@@ -34,3 +34,21 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# Application data
+applications/*.json
+cv_history/*.html
+cv_history/*.pdf
+
+# Config (contains API keys)
+config.json

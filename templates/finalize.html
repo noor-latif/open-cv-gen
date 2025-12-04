@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Review & Generate CV - CV Tailoring{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-900">Review Your Answers</h1>
+        <p class="mt-2 text-gray-600">Review your answers before we generate your tailored CV</p>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">Job Information</h2>
+        <div class="space-y-2">
+            <p><strong>Company:</strong> {{ company }}</p>
+            <p><strong>Job Title:</strong> {{ job_title }}</p>
+            <p><strong>Job Description:</strong></p>
+            <div class="bg-gray-50 p-4 rounded-md max-h-40 overflow-y-auto">
+                <pre class="text-sm text-gray-700 whitespace-pre-wrap">{{ job_description[:500] }}{% if job_description|length > 500 %}...{% endif %}</pre>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">Your Answers</h2>
+        <div class="space-y-4">
+            {% for skill, answer in answers.items() %}
+            <div class="border-b border-gray-200 pb-4 last:border-b-0 last:pb-0">
+                <h3 class="font-semibold text-gray-900 mb-2">{{ skill }}</h3>
+                <div class="ml-4 space-y-1 text-sm">
+                    {% if answer.has_experience %}
+                    <p><span class="text-green-600 font-medium">✓ Has Experience</span></p>
+                    {% if answer.experience_level %}
+                    <p><strong>Level:</strong> {{ answer.experience_level|title }}</p>
+                    {% endif %}
+                    {% if answer.description %}
+                    <p><strong>Description:</strong> {{ answer.description }}</p>
+                    {% endif %}
+                    {% elif answer.has_experience == False %}
+                    <p><span class="text-yellow-600 font-medium">⚠ Related Experience</span></p>
+                    {% if answer.related_experience %}
+                    <p><strong>Related Experience:</strong> {{ answer.related_experience }}</p>
+                    {% endif %}
+                    {% else %}
+                    <p><span class="text-gray-500">⊘ Skipped</span></p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <form method="POST" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div class="flex space-x-4">
+            <a href="{{ url_for('cv.questions') }}" 
+               class="flex-1 text-center px-6 py-3 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                ← Back to Questions
+            </a>
+            <button type="submit" 
+                    class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                Generate Tailored CV
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+

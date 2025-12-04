@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}Skill Gap Questions - CV Tailoring{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="mb-6">
+        <div class="flex items-center justify-between mb-2">
+            <h1 class="text-3xl font-bold text-gray-900">Skill Gap Questions</h1>
+            <span class="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
+                Question {{ skill_index }} of {{ total_skills }}
+            </span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2 mb-4">
+            <div class="bg-blue-600 h-2 rounded-full" style="width: {{ (skill_index / total_skills * 100) }}%"></div>
+        </div>
+        <p class="text-gray-600">Help us tailor your CV by answering questions about your experience</p>
+    </div>
+
+    <form method="POST" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div class="space-y-6">
+            <div class="bg-yellow-50 border border-yellow-200 rounded-md p-4">
+                <h2 class="text-xl font-semibold text-yellow-900 mb-2">
+                    Do you have experience with <strong>{{ skill }}</strong>?
+                </h2>
+                <p class="text-sm text-yellow-700 mb-4">
+                    This skill was mentioned in the job description but not found in your current CV.
+                </p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-3">
+                    Experience Level
+                </label>
+                <div class="space-y-2">
+                    <label class="flex items-center">
+                        <input type="radio" 
+                               name="has_experience" 
+                               value="yes" 
+                               class="mr-2"
+                               {% if existing_answer.has_experience %}checked{% endif %}
+                               required>
+                        <span class="text-sm text-gray-700">Yes, I have experience</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="radio" 
+                               name="has_experience" 
+                               value="no" 
+                               class="mr-2"
+                               {% if existing_answer.has_experience == False %}checked{% endif %}
+                               required>
+                        <span class="text-sm text-gray-700">No, but I have related experience</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="radio" 
+                               name="has_experience" 
+                               value="skip" 
+                               class="mr-2"
+                               {% if not existing_answer.has_experience and existing_answer.has_experience is not none and existing_answer.has_experience != False %}checked{% endif %}>
+                        <span class="text-sm text-gray-700">Skip this skill</span>
+                    </label>
+                </div>
+            </div>
+
+            <div id="experience-details" style="display: none;">
+                <div class="mb-4">
+                    <label for="experience_level" class="block text-sm font-medium text-gray-700 mb-2">
+                        Experience Level
+                    </label>
+                    <select id="experience_level" 
+                            name="experience_level" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Select level...</option>
+                        <option value="beginner" {% if existing_answer.experience_level == 'beginner' %}selected{% endif %}>Beginner</option>
+                        <option value="intermediate" {% if existing_answer.experience_level == 'intermediate' %}selected{% endif %}>Intermediate</option>
+                        <option value="advanced" {% if existing_answer.experience_level == 'advanced' %}selected{% endif %}>Advanced</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
+                        Describe your experience with {{ skill }}
+                    </label>
+                    <textarea id="description" 
+                              name="description" 
+                              rows="4"
+                              placeholder="Describe projects, tasks, or responsibilities where you used this skill..."
+                              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">{{ existing_answer.description or '' }}</textarea>
+                    <p class="mt-1 text-sm text-gray-500">This will help us tailor your CV to highlight relevant experience</p>
+                </div>
+            </div>
+
+            <div id="related-experience" style="display: none;">
+                <div class="mb-4">
+                    <label for="related_experience" class="block text-sm font-medium text-gray-700 mb-2">
+                        Describe related experience or transferable skills
+                    </label>
+                    <textarea id="related_experience" 
+                              name="related_experience" 
+                              rows="4"
+                              placeholder="Describe similar skills, tools, or experiences that relate to {{ skill }}..."
+                              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">{{ existing_answer.related_experience or '' }}</textarea>
+                    <p class="mt-1 text-sm text-gray-500">Even if you don't have direct experience, related skills can be valuable</p>
+                </div>
+            </div>
+
+            <div class="flex space-x-4">
+                {% if can_go_back %}
+                <form method="POST" action="{{ url_for('cv.questions_previous') }}" class="flex-1">
+                    <button type="submit" 
+                            class="w-full px-6 py-3 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                        ← Previous
+                    </button>
+                </form>
+                {% else %}
+                <div class="flex-1"></div>
+                {% endif %}
+                
+                <button type="submit" 
+                        class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                    {% if skill_index < total_skills %}Next →{% else %}Review Answers{% endif %}
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Show/hide fields based on experience selection
+    const experienceRadios = document.querySelectorAll('input[name="has_experience"]');
+    const experienceDetails = document.getElementById('experience-details');
+    const relatedExperience = document.getElementById('related-experience');
+    
+    function updateFields() {
+        const selected = document.querySelector('input[name="has_experience"]:checked');
+        if (!selected) return;
+        
+        if (selected.value === 'yes') {
+            experienceDetails.style.display = 'block';
+            relatedExperience.style.display = 'none';
+            // Make experience level and description optional when yes is selected
+            document.getElementById('experience_level').removeAttribute('required');
+            document.getElementById('description').removeAttribute('required');
+        } else if (selected.value === 'no') {
+            experienceDetails.style.display = 'none';
+            relatedExperience.style.display = 'block';
+            document.getElementById('related_experience').removeAttribute('required');
+        } else {
+            // Skip option
+            experienceDetails.style.display = 'none';
+            relatedExperience.style.display = 'none';
+        }
+    }
+    
+    experienceRadios.forEach(radio => {
+        radio.addEventListener('change', updateFields);
+    });
+    
+    // Initialize on page load
+    updateFields();
+</script>
+{% endblock %}
+

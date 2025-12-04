@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noor CV</title>
+    <meta name="description" content="Noor CV - System Engineer / SRE / L3 Support Engineer">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..700;1,14..32,300..700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* ============================================
+           CSS Custom Properties (Color Scheme)
+           ============================================ */
+        :root {
+            --color-primary: #1e293b;
+            --color-primary-light: #334155;
+            --color-primary-lighter: #475569;
+            --color-bg-light: rgba(30, 41, 59, 0.05);
+            --color-bg-medium: rgba(30, 41, 59, 0.1);
+            --color-border: rgba(30, 41, 59, 0.15);
+            --color-accent: #3b82f6;
+            --spacing-unit: 0.75rem;
+        }
+
+        /* ============================================
+           Base Typography
+           ============================================ */
+        * {
+            font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        body {
+            color: var(--color-primary);
+            font-size: 0.875rem;
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            color: var(--color-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 400;
+            letter-spacing: 0.075em;
+            color: var(--color-primary);
+            margin-bottom: var(--spacing-unit);
+        }
+
+        h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            line-height: 1.4;
+            color: var(--color-primary);
+        }
+
+        h4 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--color-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            font-size: 0.875rem;
+            line-height: 1.7;
+            color: var(--color-primary-light);
+        }
+
+        /* ============================================
+           Layout Improvements
+           ============================================ */
+        .bg-white {
+            background-color: #ffffff;
+        }
+
+        .letter-size {
+            max-width: 210mm;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .flex.flex-row {
+            gap: 2rem;
+        }
+
+        /* Sidebar: 35% width for better balance */
+        .resume-sidebar {
+            width: 35%;
+            flex-shrink: 0;
+        }
+
+        /* Main content: 65% width */
+        .w-2\/3 {
+            width: 65%;
+        }
+
+        /* Enhanced spacing */
+        .space-y-3 > * + * {
+            margin-top: 1.25rem;
+        }
+
+        .space-y-2 > * + * {
+            margin-top: 0.75rem;
+        }
+
+        /* ============================================
+           Profile Section
+           ============================================ */
+        .resume-sidebar > div:first-child {
+            margin-bottom: 2rem;
+        }
+
+        /* ============================================
+           Skills Section - Tag/Badge Format
+           ============================================ */
+        .skill-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .skill-tag {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background-color: var(--color-bg-light);
+            border: 1px solid var(--color-border);
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--color-primary);
+            line-height: 1.5;
+        }
+
+        .skill-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .skill-group-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--color-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        /* ============================================
+           Section Headers
+           ============================================ */
+        .section-header {
+            border-bottom: 2px solid var(--color-border);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* ============================================
+           Timeline/Work Experience
+           ============================================ */
+        .timeline-item {
+            position: relative;
+            padding-left: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-left: 2px solid var(--color-border);
+            margin-left: 0.375rem;
+        }
+
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            border: 2px solid var(--color-primary);
+            border-radius: 50%;
+            background-color: white;
+            left: -8px;
+            top: 0;
+            z-index: 2;
+        }
+
+        .date-badge {
+            display: inline-block;
+            padding: 0.25rem 0.625rem;
+            background-color: var(--color-bg-medium);
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--color-primary);
+            white-space: nowrap;
+        }
+
+        /* ============================================
+           Bullet Points
+           ============================================ */
+        ol[data-list="bullet"] {
+            list-style: none;
+            padding-left: 0;
+            margin: 0.75rem 0;
+        }
+
+        ol[data-list="bullet"] > li {
+            position: relative;
+            padding-left: 1.25rem;
+            margin-bottom: 0.5rem;
+            line-height: 1.7;
+        }
+
+        ol[data-list="bullet"] > li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--color-primary);
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        /* ============================================
+           Links
+           ============================================ */
+        a {
+            color: var(--color-primary);
+            text-decoration: underline;
+            text-underline-offset: 2px;
+            transition: opacity 0.2s ease;
+        }
+
+        a:hover {
+            opacity: 0.7;
+        }
+
+        /* ============================================
+           Language Progress Bars
+           ============================================ */
+        .language-bar {
+            height: 0.5rem;
+            width: 100%;
+            background-color: var(--color-bg-light);
+            border-radius: 9999px;
+            overflow: hidden;
+            margin-top: 0.25rem;
+        }
+
+        .language-bar-fill {
+            height: 100%;
+            background-color: var(--color-primary);
+            border-radius: 9999px;
+            transition: width 0.5s ease-in-out;
+        }
+
+        /* ============================================
+           Contact Icons
+           ============================================ */
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.875rem;
+            color: var(--color-primary-light);
+        }
+
+        .contact-icon {
+            width: 1.5rem;
+            height: 1.5rem;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-primary);
+        }
+
+        /* ============================================
+           Print Styles (@media print)
+           Minimal, non-destructive print optimizations
+           ============================================ */
+        @media print {
+            /* Disable transitions and animations for print */
+            * {
+                transition: none !important;
+                animation: none !important;
+            }
+
+            /* Show URLs for links in print (additive, doesn't break layout) */
+            a[href]:after {
+                content: " (" attr(href) ")";
+                font-size: 0.75em;
+                color: #666;
+                font-weight: normal;
+            }
+
+            /* Minimal page-break controls (non-destructive) */
+            .section-header,
+            h2,
+            h3 {
+                page-break-after: avoid;
+                break-after: avoid;
+            }
+
+            .timeline-item,
+            .skill-group {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+        }
+
+        /* ============================================
+           Responsive Considerations
+           ============================================ */
+        @media (max-width: 768px) {
+            .flex.flex-row {
+                flex-direction: column;
+            }
+
+            .resume-sidebar,
+            .w-2\/3 {
+                width: 100%;
+            }
+
+            .letter-size {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body style="color-scheme: dark;">
+    <div class="bg-white letter-size break-words font-manrope">
+        <div class="flex flex-row">
+            <!-- Sidebar -->
+            <div class="resume-sidebar space-y-3">
+                <!-- Profile Section -->
+                <div class="space-y-2">
+                    <div class="mx-auto overflow-hidden mb-4" style="width:140px;height:140px;border-radius:9999px">
+                        <img alt="Noor Latif" class="w-full h-full object-cover" src="./noor-profile-picture.jpg">
+                    </div>
+                    <div class="text-center space-y-2" style="border-bottom:2px solid var(--color-border);padding-bottom:1rem;margin-bottom:1rem">
+                        <h1>Noor Latif</h1>
+                        <p style="font-size:1.25rem;font-weight:400;color:var(--color-primary-light)">System Support Engineer</p>
+                    </div>
+                    
+                    <!-- Contact Info -->
+                    <div class="space-y-2">
+                        <div class="contact-item">
+                            <span class="contact-icon">
+                                <svg class="lucide lucide-house" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path>
+                                    <path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                </svg>
+                            </span>
+                            <span>Gothenburg to Stockholm</span>
+                        </div>
+                        <div class="contact-item">
+                            <span class="contact-icon">
+                                <svg class="lucide lucide-phone" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                                </svg>
+                            </span>
+                            <span>+46 70 154 5455</span>
+                        </div>
+                        <div class="contact-item">
+                            <span class="contact-icon">
+                                <svg class="lucide lucide-mail" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+                                    <rect height="16" rx="2" width="20" x="2" y="4"></rect>
+                                    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+                                </svg>
+                            </span>
+                            <span>noor@latif.se</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Links -->
+                    <div class="space-y-2">
+                        <div class="contact-item">
+                            <span class="contact-icon">
+                                <svg class="lucide lucide-globe" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+                                    <path d="M2 12h20"></path>
+                                </svg>
+                            </span>
+                            <a href="https://linkedin.com/in/noorlatif" rel="noopener noreferrer" target="_blank">LinkedIn</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Skills Section -->
+                <div class="space-y-3">
+                    <div class="section-header">
+                        <h2>Skills</h2>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="skill-group">
+                            <div class="skill-group-title">Technical Skills</div>
+                            <div class="skill-tags">
+                                <span class="skill-tag">Kubernetes</span>
+                                <span class="skill-tag">Docker</span>
+                                <span class="skill-tag">Infrastructure as Code</span>
+                                <span class="skill-tag">CI/CD</span>
+                                <span class="skill-tag">GitOps</span>
+                                <span class="skill-tag">Azure</span>
+                                <span class="skill-tag">Cloud Computing</span>
+                                <span class="skill-tag">Linux Administration</span>
+                                <span class="skill-tag">Windows Administration</span>
+                                <span class="skill-tag">Site Reliability Engineering</span>
+                                <span class="skill-tag">Grafana</span>
+                                <span class="skill-tag">Elasticsearch</span>
+                                <span class="skill-tag">Kibana</span>
+                                <span class="skill-tag">ELK Stack</span>
+                                <span class="skill-tag">SCADA</span>
+                                <span class="skill-tag">OPC-UA</span>
+                                <span class="skill-tag">MQTT</span>
+                                <span class="skill-tag">Siemens PLC</span>
+                                <span class="skill-tag">KepServerEX</span>
+                                <span class="skill-tag">Wireshark</span>
+                                <span class="skill-tag">tcpdump</span>
+                                <span class="skill-tag">VLAN Configuration</span>
+                                <span class="skill-tag">Cloud Networking</span>
+                            </div>
+                        </div>
+                        <div class="skill-group">
+                            <div class="skill-group-title">Soft Skills</div>
+                            <div class="skill-tags">
+                                <span class="skill-tag">Support Enablement</span>
+                                <span class="skill-tag">Training</span>
+                                <span class="skill-tag">Technical Documentation</span>
+                                <span class="skill-tag">Cross-functional Collaboration</span>
+                                <span class="skill-tag">Customer Communication</span>
+                                <span class="skill-tag">Problem-Solving</span>
+                                <span class="skill-tag">Adaptable</span>
+                                <span class="skill-tag">Driven & Curious</span>
+                            </div>
+                        </div>
+                        <div class="skill-group">
+                            <div class="skill-group-title">Development</div>
+                            <div class="skill-tags">
+                                <span class="skill-tag">Python</span>
+                                <span class="skill-tag">Bash</span>
+                                <span class="skill-tag">Powershell</span>
+                                <span class="skill-tag">HTML/CSS</span>
+                                <span class="skill-tag">SQL</span>
+                                <span class="skill-tag">PostgreSQL</span>
+                                <span class="skill-tag">MSSQL</span>
+                                <span class="skill-tag">MongoDB</span>
+                                <span class="skill-tag">C#</span>
+                                <span class="skill-tag">.NET</span>
+                                <span class="skill-tag">C/C++</span>
+                                <span class="skill-tag">Test-Driven Development</span>
+                                <span class="skill-tag">pytest</span>
+                                <span class="skill-tag">API Integration</span>
+                                <span class="skill-tag">Agile</span>
+                                <span class="skill-tag">DevOps</span>
+                                <span class="skill-tag">IT Service Management</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Languages Section -->
+                <div class="space-y-3">
+                    <div class="section-header">
+                        <h2>Languages</h2>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="space-y-1">
+                            <div class="flex justify-between items-center gap-4">
+                                <span class="text-sm flex-1 min-w-0" style="color:#334155">English</span>
+                            </div>
+                    <div class="language-bar">
+                        <div class="language-bar-fill" style="width:100%"></div>
+                    </div>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="flex justify-between items-center gap-4">
+                                <span class="text-sm flex-1 min-w-0" style="color:#334155">Swedish</span>
+                            </div>
+                    <div class="language-bar">
+                        <div class="language-bar-fill" style="width:100%"></div>
+                    </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="w-2/3 pl-6 space-y-3" style="width: 65%;">
+                <!-- Professional Summary -->
+                <div class="space-y-3">
+                    <div class="section-header">
+                        <h2>Professional Summary</h2>
+                    </div>
+                    <div class="ql-editor break-words text-sm leading-tight">
+                        <p><strong>L3 Support/SRE Engineer</strong></p>
+                        <p><strong>Focus: Infrastructure Automation & Support Enablement</strong></p>
+                        <p>Built automation serving 350+ engineers globally, reducing deployment time 95% and support load 30% through training-driven self-service. Currently writing <em>"Beyond Ticketing: How Top Leaders Build Self-Healing Teams"</em> on AI-native operations for Nordic tech leaders.</p>
+                        <p><strong>Core Expertise:</strong> Kubernetes, CI/CD, Linux systems, Python/Bash automation. Rare combination of cloud DevOps + embedded/IoT systems (SCADA, OPC-UA, industrial environments). Proven track record transforming reactive firefighting into self-healing infrastructure.</p>
+                        <p><strong>Impact:</strong> Scale support by empowering teams, not just closing tickets. Created training programs adopted by 600+ engineers globally. Bring hands-on troubleshooting from critical infrastructure (warehouse automation, tram networks) with modern SRE practices.</p>
+                    </div>
+                </div>
+                
+                <!-- Work Experience -->
+                <div class="space-y-3">
+                    <div class="section-header">
+                        <h2>Work Experience</h2>
+                    </div>
+                    <div class="space-y-3">
+                        <!-- Job 1 -->
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="flex justify-between items-baseline gap-4">
+                                <h3 class="flex-1 min-w-0">System Support Engineer</h3>
+                                <span class="date-badge">Jan 2021 — Present</span>
+                            </div>
+                            <div class="flex justify-between items-baseline">
+                                <p class="text-sm flex-1 min-w-0">Toyota Logistics Solutions</p>
+                                <p class="flex-shrink-0 text-xs">Göteborg, Sweden</p>
+                            </div>
+                            <div class="ql-editor break-words text-sm leading-tight">
+                                <p>Built full-stack automation platform that transformed infrastructure deployment for autonomous forklift systems, saving 3 hours/week for 350 engineers globally and increasing environment deployments by 10-20x.</p>
+                                <ol>
+                                    <li data-list="bullet">
+                                        <span class="ql-ui" contenteditable="false"></span>
+                                        <strong>Developed custom Infrastructure-as-Code framework and web application</strong> (Python-based) that automated Docker/Kubernetes deployments, reducing test environment setup from days to 5–10 minutes and saving thousands of support hours annually.
+                                    </li>
+                                    <li data-list="bullet">
+                                        <span class="ql-ui" contenteditable="false"></span>
+                                        <strong>Created technical training program</strong> adopted by 600 engineers globally, reducing 3rd-line support tickets by 30% in the first months post-launch.
+                                    </li>
+                                    <li data-list="bullet">
+                                        <span class="ql-ui" contenteditable="false"></span>
+                                        Provided <strong>Linux expertise</strong> across multi-OS environments, supporting Docker orchestration and system reliability improvements.
+                                    </li>
+                                </ol>
+                                <p><strong>Key Technologies:</strong> Python, Docker, Kubernetes, Azure DevOps, Linux, IaC</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Job 2 -->
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="flex justify-between items-baseline gap-4">
+                                <h3 class="flex-1 min-w-0">Network and System Technician</h3>
+                                <span class="date-badge">Jan 2023 — Feb 2023</span>
+                            </div>
+                            <div class="flex justify-between items-baseline">
+                                <p class="text-sm flex-1 min-w-0">Göteborgs Spårvägar</p>
+                                <p class="flex-shrink-0 text-xs">Gothenburg, Sweden</p>
+                            </div>
+                            <div class="ql-editor break-words text-sm leading-tight">
+                                <p><strong>Technician & Programmer</strong></p>
+                                <p>Maintained IT infrastructure for Gothenburg's tram network (263 trams, 500+ buses), working with vehicle computers, embedded systems, and industrial IoT in live operational environment.</p>
+                                <ol>
+                                    <li data-list="bullet">
+                                        <span class="ql-ui" contenteditable="false"></span>
+                                        <strong>Automated firmware provisioning for linux-based travel display systems</strong>, reducing deployment time from 2 hours to 10 minutes per unit—processing ~10 displays weekly.
+                                    </li>
+                                    <li data-list="bullet">
+                                        <span class="ql-ui" contenteditable="false"></span>
+                                        Serviced and programmed <strong>RAKEL</strong> radio units, vehicle computers, network equipment, and surveillance systems across the fleet.
+                                    </li>
+                                    <li data-list="bullet">
+                                        <span class="ql-ui" contenteditable="false"></span>
+                                        Performed <strong>network troubleshooting and infrastructure</strong> maintenance for mobile datacenter environments operating at high speeds.
+                                    </li>
+                                </ol>
+                                <p><strong>Key Technologies:</strong> Bash, Linux, Industrial IoT, Networking</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Job 3 -->
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="flex justify-between items-baseline gap-4">
+                                <h3 class="flex-1 min-w-0">Hardware & Software Developer</h3>
+                                <span class="date-badge">Feb 2021 — Sep 2022</span>
+                            </div>
+                            <div class="flex justify-between items-baseline">
+                                <p class="text-sm flex-1 min-w-0">Aqua Robur Technologies</p>
+                                <p class="flex-shrink-0 text-xs">Gothenburg, Sweden</p>
+                            </div>
+                            <div class="ql-editor break-words text-sm leading-tight">
+                                <p><strong>Hardware and Software Developer</strong></p>
+                                <p>Developed embedded IoT solutions and provisioning automation at water-tech startup (33-listan 2020) pioneering self-powered sensors for leak detection in municipal water networks.</p>
+                                <ol>
+                                    <li data-list="bullet">
+                                        <span class="ql-ui" contenteditable="false"></span>
+                                        <strong>Automated device provisioning with Python</strong>, reducing setup from 1 hour to 20 minutes per device—processing ~70 units weekly and eliminating manual configuration errors across 400+ SCADA/HMI client connections via KepServerEX API.
+                                    </li>
+                                    <li data-list="bullet">
+                                        <span class="ql-ui" contenteditable="false"></span>
+                                        <strong>Optimized energy harvester firmware</strong> (embedded C/C++) for micro-turbine systems, achieving 30% improvement in energy efficiency through state machine optimization and bug fixes.
+                                    </li>
+                                    <li data-list="bullet">
+                                        <span class="ql-ui" contenteditable="false"></span>
+                                        <strong>Developed portable sensor-tester</strong> (Arduino/C) with integrated display for factory quality control, streamlining end-of-line testing and defect detection.
+                                    </li>
+                                    <li data-list="bullet">
+                                        <span class="ql-ui" contenteditable="false"></span>
+                                        Led certificate lifecycle automation project, strengthening security infrastructure for customer deployments.
+                                    </li>
+                                </ol>
+                                <p><strong>Key Technologies:</strong> Embedded C/C++, Python, SCADA, OPC-UA, Arduino, IoT Security, Linux</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Education -->
+                <div class="space-y-3">
+                    <div class="section-header">
+                        <h2>Education</h2>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="flex justify-between items-baseline gap-4">
+                                <h3 class="flex-1 min-w-0">IoT Software Development</h3>
+                                <span class="date-badge">Sep 2020 — Jun 2022</span>
+                            </div>
+                            <div class="flex justify-between items-baseline">
+                                <p class="text-sm flex-1 min-w-0">EC Utbildning (Yrkesexamen)</p>
+                                <p class="flex-shrink-0 text-xs">Gothenburg, Sweden</p>
+                            </div>
+                            <div class="ql-editor break-words text-sm leading-tight">
+                                <p>Key Courses: Integration engineering, Industrial Cloud Solutions, IT Security, Agile Project Methods</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Projects -->
+                <div class="space-y-3">
+                    <div class="section-header">
+                        <h2>Projects</h2>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="flex justify-between items-baseline gap-4">
+                                <h3 class="flex-1 min-w-0">
+                                    <a href="https://ai.latif.se/" rel="noopener noreferrer" target="_blank">AI Portfolio & Interview Assistant</a>
+                                </h3>
+                                <span class="date-badge">Nov 2025 — Present</span>
+                            </div>
+                            <div class="ql-editor break-words text-sm leading-tight">
+                                <p>Built full-stack Next.js application enabling recruiters to interview an AI digital twin about technical expertise, reducing initial screening friction and showcasing modern web development skills.</p>
+                                <ol>
+                                    <li data-list="bullet">
+                                        <span class="ql-ui" contenteditable="false"></span>
+                                        <strong>Developed intelligent chat interface</strong> with project-specific AI assistants trained on career context, allowing recruiters to query technical experience 24/7 across timezones without scheduling calls.
+                                    </li>
+                                    <li data-list="bullet">
+                                        <span class="ql-ui" contenteditable="false"></span>
+                                        <strong>Implemented automated CI/CD pipeline</strong> with GitHub Actions for test-driven development and zero-downtime deployments on Vercel.
+                                    </li>
+                                    <li data-list="bullet">
+                                        <span class="ql-ui" contenteditable="false"></span>
+                                        <strong>Designed dual-pane modal architecture</strong> with suggested questions and context panels, creating intuitive recruiter experience for technical deep-dives into specific projects.
+                                    </li>
+                                </ol>
+                                <p><strong>Key Technologies:</strong> Next.js, TypeScript, Mistral AI API, GitHub Actions, Vercel, TDD</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Certifications -->
+                <div class="space-y-3">
+                    <div class="section-header">
+                        <h2>Certifications</h2>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="flex justify-between items-baseline gap-4">
+                                <h3 class="flex-1 min-w-0">Certified Industrial IoT Software Developer</h3>
+                                <span class="date-badge">Sep 2020</span>
+                            </div>
+                            <div class="flex justify-between items-baseline">
+                                <p class="text-sm flex-1 min-w-0">EC Utbildning</p>
+                            </div>
+                            <div class="ql-editor break-words text-sm leading-tight">
+                                <p>Infrastructure, cloud & Automation focus</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="flex justify-between items-baseline gap-4">
+                                <h3 class="flex-1 min-w-0">
+                                    <a href="https://www.freecodecamp.org/certification/fcc34a08e5f/foundational-c-sharp-with-microsoft" rel="noopener noreferrer" target="_blank">Foundational C# with Microsoft</a>
+                                </h3>
+                                <span class="date-badge">Nov 2024</span>
+                            </div>
+                            <div class="flex justify-between items-baseline">
+                                <p class="text-sm flex-1 min-w-0">Microsoft & freecodecamp</p>
+                            </div>
+                            <div class="ql-editor break-words text-sm leading-tight">
+                                <p>Developer Certification from Microsoft Developer Division</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

@@ -35,14 +35,7 @@ async def html_to_pdf(html_path: str, output_path: str = None) -> None:
             # Load the HTML file
             await page.goto(f"file://{html_abs_path}", wait_until="networkidle")
             
-            # Remove dark color scheme and force light theme
-            await page.evaluate("""
-                document.documentElement.removeAttribute('style');
-                document.documentElement.style.colorScheme = 'light';
-                document.documentElement.style.backgroundColor = 'white';
-            """)
-            
-            # Import and apply Inter font from Google Fonts + force white backgrounds
+            # Import and apply Inter font from Google Fonts
             await page.add_style_tag(content="""
                 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
                 
@@ -51,39 +44,18 @@ async def html_to_pdf(html_path: str, output_path: str = None) -> None:
                     font-optical-sizing: auto;
                     font-style: normal;
                 }
-                
-                html {
-                    background-color: white !important;
-                    background: white !important;
-                    color-scheme: light !important;
-                    margin: 0 !important;
-                    padding: 0 !important;
-                }
-                
-                body {
-                    background-color: white !important;
-                    background: white !important;
-                    margin: 0 !important;
-                    padding: 30px 25px 0 25px !important;
-                }
-                
-                @page {
-                    margin: 0;
-                    background: white;
-                }
             """)
             
             # Wait for font to load from Google Fonts
             await page.wait_for_timeout(500)
             
-            # Generate PDF with minimal margins
+            # Generate PDF with 95% scale and 0 margins (negative margins applied via CSS above)
             await page.pdf(
                 path=str(output_path),
                 format="A4",
                 print_background=True,
                 scale=0.91,
-                margin={"top": "0px", "right": "0px", "bottom": "0px", "left": "0px"},
-                prefer_css_page_size=False,
+                margin={"top": "0px", "right": "25px", "bottom": "0px", "left": "25px"},
             )
             
             await browser.close()

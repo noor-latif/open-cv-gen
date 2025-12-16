@@ -1,5 +1,6 @@
 """AI client using OpenAI SDK configured for Vercel AI Gateway."""
 
+import json
 import os
 from typing import Dict, List, Optional
 
@@ -115,9 +116,96 @@ Job Description:
             # Fallback: return empty list
             return []
     
+    def analyze_cv_job_alignment(self, cv_text: str, job_description: str) -> Dict:
+        """
+        Use semantic analysis to understand CV-job alignment.
+        
+        This method uses AI to semantically analyze how well a CV matches a job description,
+        understanding context, synonyms, and related terms rather than simple keyword matching.
+        
+        Args:
+            cv_text: Full text content of the CV
+            job_description: Target job description
+        
+        Returns:
+            Dict with:
+                - required_skills: Key skills/requirements from job description
+                - relevant_experience: Skills/experience from CV that match job (with evidence)
+                - gaps: True gaps where CV genuinely lacks required experience
+                - matched_experience: Experience in CV that matches job requirements
+                - suggestions: How to highlight existing experience or address gaps
+        """
+        system_prompt = """You are an expert CV analyst. Analyze how well a CV matches a job description using semantic understanding, not keyword matching.
+
+Consider:
+- Synonyms and related terms (e.g., "IoT" = "Internet of Things" = "embedded systems")
+- Context and experience level
+- Transferable skills
+- Experience mentioned in different sections (summary, work history, education, certifications)
+
+Return ONLY valid JSON with this exact structure:
+{
+  "required_skills": ["list of key skills/requirements from job description"],
+  "relevant_experience": ["list of skills/experience from CV that match job, with brief context"],
+  "gaps": ["list of true gaps where CV genuinely lacks required experience"],
+  "matched_experience": ["list of experience in CV that matches job requirements"],
+  "suggestions": "text describing how to highlight existing experience or address gaps"
+}
+
+Do NOT include markdown code blocks. Return only the JSON object."""
+        
+        prompt = f"""Analyze this CV against the job description using semantic understanding.
+
+Job Description:
+{job_description}
+
+CV Content:
+{cv_text}
+
+Identify:
+1. What relevant experience/skills does the CV demonstrate for this job? (Consider synonyms, related terms, and context)
+2. What are the actual gaps? (Only flag skills/experience that are truly missing, not just keyword mismatches)
+3. How can the candidate highlight existing relevant experience?
+
+Return valid JSON only with the structure specified in the system prompt."""
+        
+        try:
+            response = self.generate(prompt, system_prompt, temperature=0.3)
+            
+            # Extract JSON from response
+            response = response.strip()
+            if '```json' in response:
+                response = response.split('```json')[1].split('```')[0].strip()
+            elif '```' in response:
+                response = response.split('```')[1].split('```')[0].strip()
+            
+            analysis = json.loads(response)
+            
+            # Ensure all required keys exist
+            return {
+                'required_skills': analysis.get('required_skills', []),
+                'relevant_experience': analysis.get('relevant_experience', []),
+                'gaps': analysis.get('gaps', []),
+                'matched_experience': analysis.get('matched_experience', []),
+                'suggestions': analysis.get('suggestions', '')
+            }
+        except (json.JSONDecodeError, KeyError) as e:
+            # Fallback to basic structure if parsing fails
+            print(f"Warning: Failed to parse semantic analysis response: {e}")
+            return {
+                'required_skills': [],
+                'relevant_experience': [],
+                'gaps': [],
+                'matched_experience': [],
+                'suggestions': 'Unable to perform semantic analysis. Please check CV and job description.'
+            }
+    
     def analyze_skill_gaps(self, required_skills: List[str], cv_skills: List[str]) -> Dict:
         """
         Analyze gaps between required skills and CV skills.
+        
+        NOTE: This method is kept for backward compatibility. The new semantic analysis
+        approach using analyze_cv_job_alignment() is preferred.
         
         Returns:
             Dict with 'missing', 'present', 'suggestions'
@@ -160,17 +248,13 @@ Format as a simple list."""
         Returns:
             Tailored CV HTML
         """
-        from bs4 import BeautifulSoup
+        from app.cv_data import CVDataExtractor, CVRenderer
         
-        # Parse CV HTML
-        soup = BeautifulSoup(cv_html, 'html.parser')
+        # Extract CV data to JSON
+        cv_data = CVDataExtractor.extract(cv_html)
         
-        # Extract current content
-        summary_section = soup.find('div', class_='ql-editor')
-        if summary_section:
-            current_summary = summary_section.get_text()[:500]
-        else:
-            current_summary = ""
+        # Convert to JSON string for AI processing
+        cv_json = json.dumps(cv_data, indent=2, ensure_ascii=False)
         
         # Build context from historical CVs
         historical_context = ""
@@ -179,34 +263,80 @@ Format as a simple list."""
             for hist in historical_cvs[:3]:
                 historical_context += f"- {hist['company']} ({hist['job_title']}): Added skills {', '.join(hist.get('skills_added', []))}\n"
         
-        system_prompt = """You are a CV tailoring expert. Adapt the CV content to better match 
-        the job description while maintaining accuracy and authenticity. Focus on:
-        1. Professional summary - emphasize relevant experience
-        2. Work experience bullets - highlight relevant achievements
-        3. Skills section - ensure all relevant skills are visible
+        # Extract current summary for style reference
+        current_summary = cv_data.get('summary', '')
         
-        Return the complete HTML with tailored content. Preserve all HTML structure, classes, and styling."""
+        system_prompt = """You are a CV tailoring expert. You will receive CV data in JSON format.
+        Your task is to modify ONLY the text content to better match the job description while maintaining accuracy and authenticity.
         
-        prompt = f"""Tailor this CV to match the job description below.
+        IMPORTANT RULES:
+        1. Return ONLY valid JSON - no markdown code blocks, no explanations
+        2. Preserve the exact JSON structure - all keys, arrays, and object structure must remain the same
+        3. Only modify text values (strings) - do NOT change structure, add/remove keys, or modify arrays in ways that break the format
+        4. You CAN add items to arrays (e.g., add a new project, add skills to a skill group)
+        5. Professional Summary Tailoring:
+           - MUST tailor the professional summary to emphasize relevant experience for this job
+           - MAINTAIN the current writing style: concise, metrics-focused, uses strong action verbs
+           - PRESERVE the structure: bold headings, specific numbers (e.g., "350+ engineers", "95%", "30%")
+           - KEEP the authentic voice and tone - mimic the current style exactly
+           - Use semantic understanding to highlight relevant experience, not just keyword matching
+        6. Work experience bullets: highlight relevant achievements
+        7. Skills section: ensure all relevant skills are visible (add missing ones to appropriate categories)
+        
+        Return the complete JSON object with tailored content."""
+        
+        prompt = f"""Tailor this CV data to match the job description below.
 
 Job Description:
 {job_description}
 
-Current CV Summary (first 500 chars):
-{current_summary}
+Current CV Data (JSON):
+{cv_json}
 {historical_context}
 
-Return the complete HTML CV with tailored content. Keep all HTML structure, classes, IDs, and styling exactly as they are.
-Only modify the text content (professional summary, work experience descriptions, skills) to better match the job.
-Do not change any HTML tags, attributes, or structure."""
+Current Professional Summary Style Reference:
+{current_summary}
+
+IMPORTANT: When tailoring the professional summary:
+- Analyze the current summary style above and mimic it exactly
+- Keep the same structure: bold headings, metrics, concise paragraphs
+- Maintain the authentic voice and writing tone
+- Use semantic understanding to emphasize relevant experience for this job
+- Do NOT change the writing style - only adjust content to be more relevant
+
+Return the tailored CV data as valid JSON. Only modify text content to better match the job.
+You can add new skills to existing skill groups, add new projects, or enhance descriptions.
+Do NOT change the JSON structure or remove existing data."""
         
-        tailored_html = self.generate(prompt, system_prompt, temperature=0.5)
+        tailored_json_str = self.generate(prompt, system_prompt, temperature=0.5)
         
-        # Try to extract HTML from markdown code block if present
-        if '```html' in tailored_html:
-            tailored_html = tailored_html.split('```html')[1].split('```')[0].strip()
-        elif '```' in tailored_html:
-            tailored_html = tailored_html.split('```')[1].split('```')[0].strip()
+        # Extract JSON from response
+        tailored_json_str = tailored_json_str.strip()
+        if '```json' in tailored_json_str:
+            tailored_json_str = tailored_json_str.split('```json')[1].split('```')[0].strip()
+        elif '```' in tailored_json_str:
+            tailored_json_str = tailored_json_str.split('```')[1].split('```')[0].strip()
+        
+        # Parse JSON
+        try:
+            tailored_data = json.loads(tailored_json_str)
+        except json.JSONDecodeError as e:
+            # Fallback: return original if JSON parsing fails
+            print(f"Warning: Failed to parse AI response as JSON: {e}")
+            return cv_html
+        
+        # Render JSON back to HTML using template
+        # Load base template
+        from app.storage import Storage
+        storage = Storage()
+        config = storage.load_config()
+        template_path = storage.base_dir / config.get('cv_template_path', 'cv.html')
+        
+        with open(template_path, 'r', encoding='utf-8') as f:
+            template_html = f.read()
+        
+        # Render tailored data into template
+        tailored_html = CVRenderer.render(template_html, tailored_data)
         
         return tailored_html
     
@@ -229,17 +359,13 @@ Do not change any HTML tags, attributes, or structure."""
         Returns:
             Tailored CV HTML
         """
-        from bs4 import BeautifulSoup
+        from app.cv_data import CVDataExtractor, CVRenderer
         
-        # Parse CV HTML
-        soup = BeautifulSoup(cv_html, 'html.parser')
+        # Extract CV data to JSON
+        cv_data = CVDataExtractor.extract(cv_html)
         
-        # Extract current content
-        summary_section = soup.find('div', class_='ql-editor')
-        if summary_section:
-            current_summary = summary_section.get_text()[:500]
-        else:
-            current_summary = ""
+        # Convert to JSON string for AI processing
+        cv_json = json.dumps(cv_data, indent=2, ensure_ascii=False)
         
         # Build context from historical CVs
         historical_context = ""
@@ -265,43 +391,88 @@ Do not change any HTML tags, attributes, or structure."""
                 else:
                     answers_context += f"- {skill}: No direct experience\n"
         
-        system_prompt = """You are a CV tailoring expert. Adapt the CV content to better match 
-        the job description while maintaining accuracy and authenticity. Use the user's provided 
-        experience details to highlight relevant skills and frame their experience appropriately.
+        # Extract current summary for style reference
+        current_summary = cv_data.get('summary', '')
         
-        Focus on:
-        1. Professional summary - emphasize relevant experience based on user's answers
-        2. Work experience bullets - incorporate user's experience descriptions naturally
-        3. Skills section - ensure all relevant skills are visible
-        4. For skills with related experience, frame them as transferable skills
+        system_prompt = """You are a CV tailoring expert. You will receive CV data in JSON format.
+        Your task is to modify ONLY the text content to better match the job description while maintaining accuracy and authenticity.
+        Use the user's provided experience details to highlight relevant skills and frame their experience appropriately.
         
-        Return the complete HTML with tailored content. Preserve all HTML structure, classes, and styling."""
+        IMPORTANT RULES:
+        1. Return ONLY valid JSON - no markdown code blocks, no explanations
+        2. Preserve the exact JSON structure - all keys, arrays, and object structure must remain the same
+        3. Only modify text values (strings) - do NOT change structure, add/remove keys, or modify arrays in ways that break the format
+        4. You CAN add items to arrays (e.g., add a new project, add skills to a skill group)
+        5. Professional Summary Tailoring:
+           - MUST tailor the professional summary to emphasize relevant experience based on user's answers
+           - MAINTAIN the current writing style: concise, metrics-focused, uses strong action verbs
+           - PRESERVE the structure: bold headings, specific numbers (e.g., "350+ engineers", "95%", "30%")
+           - KEEP the authentic voice and tone - mimic the current style exactly
+           - Use semantic understanding to highlight relevant experience, not just keyword matching
+        6. Work experience bullets: incorporate user's experience descriptions naturally
+        7. Skills section: ensure all relevant skills are visible (add missing ones to appropriate categories)
+        8. For skills with related experience, frame them as transferable skills
         
-        prompt = f"""Tailor this CV to match the job description below, incorporating the user's experience details.
+        Return the complete JSON object with tailored content."""
+        
+        prompt = f"""Tailor this CV data to match the job description below, incorporating the user's experience details.
 
 Job Description:
 {job_description}
 
-Current CV Summary (first 500 chars):
-{current_summary}
+Current CV Data (JSON):
+{cv_json}
 {historical_context}
 {answers_context}
 
-Return the complete HTML CV with tailored content. Keep all HTML structure, classes, IDs, and styling exactly as they are.
-Only modify the text content (professional summary, work experience descriptions, skills) to better match the job.
+Current Professional Summary Style Reference:
+{current_summary}
+
+IMPORTANT: When tailoring the professional summary:
+- Analyze the current summary style above and mimic it exactly
+- Keep the same structure: bold headings, metrics, concise paragraphs
+- Maintain the authentic voice and writing tone
+- Use semantic understanding to emphasize relevant experience for this job based on user's answers
+- Do NOT change the writing style - only adjust content to be more relevant
+
+Return the tailored CV data as valid JSON. Only modify text content to better match the job.
 Use the user's experience details to:
 - Highlight skills they have experience with
 - Frame related experience appropriately
 - Emphasize transferable skills where applicable
-Do not make up experience - only use what the user has provided."""
+You can add new skills to existing skill groups, add new projects, or enhance descriptions.
+Do NOT make up experience - only use what the user has provided.
+Do NOT change the JSON structure or remove existing data."""
         
-        tailored_html = self.generate(prompt, system_prompt, temperature=0.5)
+        tailored_json_str = self.generate(prompt, system_prompt, temperature=0.5)
         
-        # Try to extract HTML from markdown code block if present
-        if '```html' in tailored_html:
-            tailored_html = tailored_html.split('```html')[1].split('```')[0].strip()
-        elif '```' in tailored_html:
-            tailored_html = tailored_html.split('```')[1].split('```')[0].strip()
+        # Extract JSON from response
+        tailored_json_str = tailored_json_str.strip()
+        if '```json' in tailored_json_str:
+            tailored_json_str = tailored_json_str.split('```json')[1].split('```')[0].strip()
+        elif '```' in tailored_json_str:
+            tailored_json_str = tailored_json_str.split('```')[1].split('```')[0].strip()
+        
+        # Parse JSON
+        try:
+            tailored_data = json.loads(tailored_json_str)
+        except json.JSONDecodeError as e:
+            # Fallback: return original if JSON parsing fails
+            print(f"Warning: Failed to parse AI response as JSON: {e}")
+            return cv_html
+        
+        # Render JSON back to HTML using template
+        # Load base template
+        from app.storage import Storage
+        storage = Storage()
+        config = storage.load_config()
+        template_path = storage.base_dir / config.get('cv_template_path', 'cv.html')
+        
+        with open(template_path, 'r', encoding='utf-8') as f:
+            template_html = f.read()
+        
+        # Render tailored data into template
+        tailored_html = CVRenderer.render(template_html, tailored_data)
         
         return tailored_html
 
